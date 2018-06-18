@@ -1,9 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import * as firebase from 'firebase'
-import {
-    resolve
-} from 'path';
 
 Vue.use(Vuex)
 
