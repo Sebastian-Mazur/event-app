@@ -14,16 +14,17 @@
                 min-width="290px"              
             >
                 <v-text-field
-                slot="activator"
-                v-model="date"
-                :label="labelName"
-                prepend-icon="event"
-                readonly
+                    slot="activator"
+                    v-model="date"
+                    :label="labelName"
+                    prepend-icon="event"
+                    readonly                
+                    required
                 ></v-text-field>
                 <v-date-picker 
                     v-model="date" 
                     @input="$refs.menu.save(date)" 
-                    :min="currentData.toString()"
+                    :min = currentData
                     @change="pushDate"
                 ></v-date-picker>
             </v-menu>
@@ -37,12 +38,7 @@ export default {
     data: () => ({
         date: null,
         menu: false,
-        currentData:
-            new Date().getFullYear() +
-            "-0" +
-            new Date().getMonth() +
-            "-" +
-            new Date().getDate()
+        currentData: new Date().toISOString().substring(0, 10)
     }),
     mounted() {
         if (this.editedDate === "" && this.date == null) {
@@ -58,3 +54,4 @@ export default {
     }
 };
 </script>
+

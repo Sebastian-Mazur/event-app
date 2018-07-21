@@ -13,7 +13,6 @@
                                 label="Title"
                                 id="title"
                                 v-model="editedTitle"
-                                :rules="inputRules"
                                 required>
                             </v-text-field>
                             <v-text-field
@@ -21,7 +20,6 @@
                                 label="Description"
                                 id="description"
                                 v-model="editedDescription"
-                                :rules="inputRules"
                                 multi-line
                                 required>
                             </v-text-field>
@@ -30,7 +28,6 @@
                                 label="The name of the organizer"
                                 id="organizerName"
                                 v-model="editedOrganizerName"
-                                :rules="inputRules"
                                 required>
                             </v-text-field>
                             <vuetify-google-autocomplete            
@@ -39,7 +36,6 @@
                                 label="Event adress"
                                 :value="editedLocation.name + ', ' + editedLocation.locality + ', ' + editedLocation.country"
                                 v-on:placechanged="getAddressData"
-                                :rules="[v => v.length > 0 || 'Location is required']"
                                 country="pl"           
                                 :clearable="true"
                             >
@@ -61,7 +57,7 @@
                             </date-picker>
                             <time-picker 
                                 :editedTime="editedEndTime"
-                                @setTime="setEndTime($event)"                                
+                                @setTime="setEndTime($event)"
                                 labelName="End time">
                             </time-picker>                      
                             <v-text-field
@@ -70,9 +66,7 @@
                                 id="imageUrl"
                                 v-model="editedImageUrl"
                                 type="url"
-                                pattern="https?://.+"
                                 placeholder="https://www.example.pl"
-                                :rules="inputRules"
                                 required>
                             </v-text-field>
                             <img :src="editedImageUrl" height="150">                        
@@ -82,8 +76,6 @@
                                 label="Select a category"
                                 multiple
                                 chips
-                                :rules="[v => v.length > 0 || 'Category select is required']"
-                                hint="You can choose more than one category"
                                 persistent-hint
                             ></v-select>               
                         </v-card-text>                            
@@ -95,37 +87,28 @@
                         <v-btn color="error" @click.native.stop="dialog = false">Close</v-btn>
                         <v-btn 
                             color="primary" 
-                            @click="onSaveChanges" 
-                            :disabled="!isFormValid">
+                            @click="onSaveChanges">
                             Save
                         </v-btn>
                     </v-flex>
                 </v-layout>
+                <v-card-text v-for="(msg, i) in messages" :key="i" class="error--text">  
+                    {{ msg.msg }}
+                </v-card-text>
             </v-card>
         </v-dialog>
     </v-layout>
 </template>
 
 <script>
+import { Validator } from "vee-validate";
+import { vm } from "../../config/config";
+
 export default {
     props: ["event"],
     data() {
         return {
-            dialog: false,
-            inputRules: [
-                v => !!v || "This field is required",
-                v => v.length >= 6 || "Text must be less than 6 characters"
-            ],
-            category: [
-                "Arts",
-                "Business",
-                "Charity and Causes",
-                "Community",
-                "Film and media",
-                "Food and drink",
-                "Music",
-                "Others"
-            ],
+            category: vm.$data.category,
             editedCategorySelect: this.event.categorySelect,
             editedTitle: this.event.title,
             editedDescription: this.event.description,
@@ -135,50 +118,109 @@ export default {
             editedStartDate: this.event.startDate,
             editedStartTime: this.event.startTime,
             editedEndDate: this.event.endDate,
-            editedEndTime: this.event.endTime
+            editedEndTime: this.event.endTime,
+            dialog: false,
+            validate: false,
+            messages: []
         };
     },
-    computed: {
-        isFormValid() {
-            return (
-                this.editedTitle !== "" &&
-                this.editedLocation !== "" &&
-                this.editedImageUrl !== "" &&
-                this.editedDescription !== "" &&
-                this.event.startDate !== "" &&
-                this.event.startTime !== "" &&
-                this.event.endDate !== "" &&
-                this.event.endTime !== "" &&
-                this.editedCategorySelect.length > 0 &&
-                this.editedOrganizerName !== ""
-            );
+    created() {
+        this.validator = new Validator(vm.$data.validRulesEdit);
+        this.$set(this, "errors", this.validator.errors);
+    },
+    watch: {
+        editedTitle(value) {
+            this.validator.validate("editedTitle", value);
+        },
+        editedDescription(value) {
+            this.validator.validate("editedDescription", value);
+        },
+        editedOrganizerName(value) {
+            this.validator.validate("editedOrganizerName", value);
+        },
+        editedLocation(value) {
+            this.validator.validate("editedLocation", value);
+        },
+        editedImageUrl(value) {
+            this.validator.validate("editedImageUrl", value);
+        },
+        editedCategorySelect(value) {
+            this.validator.validate("editedCategorySelect", value);
+        },
+        editedStartTime(value) {
+            this.validator.validate("editedStartTime", value);
+        },
+        editedStartDate(value) {
+            this.validator.validate("editedStartDate", value);
+        },
+        editedEndTime(value) {
+            this.validator.validate("editedEndTime", value);
+        },
+        editedEndDate(value) {
+            this.validator.validate("editedEndDate", value);
         }
     },
     methods: {
+        validateForm() {
+            this.validator
+                .validateAll({
+                    editedTitle: this.editedTitle,
+                    editedDescription: this.editedDescription,
+                    editedOrganizerName: this.editedOrganizerName,
+                    editedLocation: this.editedLocation,
+                    editedImageUrl: this.editedImageUrl,
+                    editedCategorySelect: this.editedCategorySelect,
+                    editedStartTime: this.editedStartTime,
+                    editedStartDate: this.editedStartDate,
+                    editedEndTime: this.editedEndTime,
+                    editedEndDate: this.editedEndDate
+                })
+                .then(result => {
+                    if (result) {
+                        this.validate = result;
+                        return;
+                    }
+                    this.messages = this.validator.errors.items;
+                });
+        },
         onSaveChanges() {
-            if (
-                this.editedTitle === "" ||
-                this.editedDescription === "" ||
-                this.editedOrganizerName === "" ||
-                this.editedLocation === ""
-            ) {
-                return false;
-            }
-            this.dialog = false;
-            const editedEvent = {
-                id: this.event.id,
-                title: this.editedTitle,
-                description: this.editedDescription,
-                organizerName: this.editedOrganizerName,
-                location: this.editedLocation,
-                categorySelect: this.editedCategorySelect,
-                imageUrl: this.editedImageUrl,
-                startDate: this.editedStartDate,
-                startTime: this.editedStartTime,
-                endDate: this.editedEndDate,
-                endTime: this.editedEndTime
-            };
-            this.$store.dispatch("updateEventData", editedEvent);
+            this.validator
+                .validateAll({
+                    editedTitle: this.editedTitle,
+                    editedDescription: this.editedDescription,
+                    editedOrganizerName: this.editedOrganizerName,
+                    editedLocation: this.editedLocation,
+                    editedImageUrl: this.editedImageUrl,
+                    editedCategorySelect: this.editedCategorySelect,
+                    editedStartTime: this.editedStartTime,
+                    editedStartDate: this.editedStartDate,
+                    editedEndTime: this.editedEndTime,
+                    editedEndDate: this.editedEndDate
+                })
+                .then(result => {
+                    if (result) {
+                        this.validate = result;
+                        this.dialog = false;
+                        const editedEvent = {
+                            id: this.event.id,
+                            title: this.editedTitle,
+                            description: this.editedDescription,
+                            organizerName: this.editedOrganizerName,
+                            location: this.editedLocation,
+                            categorySelect: this.editedCategorySelect,
+                            imageUrl: this.editedImageUrl,
+                            startDate: this.editedStartDate,
+                            startTime: this.editedStartTime,
+                            endDate: this.editedEndDate,
+                            endTime: this.editedEndTime,
+                            creatorID: this.event.creatorID
+                        };
+                        this.$store.dispatch("updateEventData", editedEvent);
+                        return;
+                    }
+                    this.messages = this.validator.errors.items;
+                    this.dialog = true;
+                });
         },
         getAddressData(addressData, placeResultData, id) {
             if (
@@ -199,8 +241,10 @@ export default {
                 };
             }
         },
+        clearErrors() {
+            this.errors.clear();
+        },
         setStartDate(event) {
-            console.log();
             this.editedStartDate = event;
         },
         setEndDate(event) {

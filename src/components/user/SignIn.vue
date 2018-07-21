@@ -12,13 +12,14 @@
                     <v-layout row>
                         <v-flex xs12>
                             <v-text-field
+                                v-validate="'required|email'"
                                 color="primary"
                                 name="email"
                                 label="E-mail"
                                 id="email"
                                 v-model="email"
                                 type="email"
-                                :rules="[rules.required, rules.email]"
+                                :hint="vErrors.first('email')"
                                 required>
                             </v-text-field>
                         </v-flex>
@@ -32,17 +33,19 @@
                                 id="password"
                                 v-model="password"
                                 type="password"
-                                hint="At least 6 characters"
-                                min="6"
+                                v-validate="'required|min:6'"
+                                :hint="vErrors.first('password')"                                
                                 required>
                             </v-text-field>
                         </v-flex>
                     </v-layout>
                     <v-layout row justify-end>
                         <v-flex xs3>
-                            <v-btn 
+                            <v-btn
+                                :disabled="!email || !password || vErrors.has('password') || vErrors.has('email')"
                                 type="submite"
-                                color="primary">
+                                color="primary"
+                                slot="activator">
                                 Sign in
                                 <span slot="loader" class="custom-loader">
                                     <v-icon light>cached</v-icon>
@@ -61,14 +64,7 @@ export default {
     data() {
         return {
             email: "",
-            password: "",
-            rules: {
-                required: value => !!value || "Required.",
-                email: value => {
-                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    return pattern.test(value) || "Invalid e-mail.";
-                }
-            }
+            password: ""
         };
     },
     computed: {

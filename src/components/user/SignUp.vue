@@ -12,13 +12,14 @@
                     <v-layout row>
                         <v-flex xs12>
                             <v-text-field
-                                color="secondary"
+                                color="primary"
                                 name="email"
                                 label="E-mail"
                                 id="email"
                                 v-model="email"
                                 type="email"
-                                :rules="[rules.required, rules.email]"
+                                v-validate="'required|email'"
+                                :hint="vErrors.first('email')"
                                 required>
                             </v-text-field>
                         </v-flex>
@@ -26,38 +27,42 @@
                     <v-layout row>
                         <v-flex xs12>
                             <v-text-field
-                                color="secondary"
+                                counter
+                                type="password" 
+                                color="primary"
                                 name="password"
                                 label="Password"
                                 id="password"
                                 v-model="password"
-                                type="password"
-                                hint="At least 6 characters"
-                                min="6"
+                                ref="password"
+                                v-validate="'required|min:6'"
+                                :hint="vErrors.first('password')"  
                                 required>
                             </v-text-field>
                         </v-flex>
                     </v-layout>
                     <v-layout row>
                         <v-flex xs12>
-                            <v-text-field
+                            <v-text-field  
+                                counter
+                                type="password"                             
                                 name="confirmPassword"
                                 label="Confirm Password"
                                 id="confirmPassword"
-                                v-model="confirmPassword"
-                                type="password"
+                                v-model="confirmPassword"                                
                                 required
-                                hint="At least 6 characters"
-                                min="6"
-                                :rules="[comparePasswords]">
+                                v-validate="'required|min:6|confirmed:password'"
+                                :hint="vErrors.first('password')"  
+                                >
                             </v-text-field>
                         </v-flex>
                     </v-layout>
                     <v-layout row justify-end>
                         <v-flex xs3>
                             <v-btn 
+                                :disabled="!email || !password || !confirmPassword || vErrors.has('password') || vErrors.has('email') || vErrors.first('confirmPassword')"
                                 type="submite"
-                                color="secondary">
+                                color="primary">
                                 Sign up
                                 <span slot="loader" class="custom-loader">
                                     <v-icon light>cached</v-icon>
@@ -77,22 +82,10 @@ export default {
         return {
             email: "",
             password: "",
-            confirmPassword: "",
-            rules: {
-                required: value => !!value || "Required.",
-                email: value => {
-                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    return pattern.test(value) || "Invalid e-mail.";
-                }
-            }
+            confirmPassword: ""
         };
     },
     computed: {
-        comparePasswords() {
-            return this.password !== this.confirmPassword
-                ? "Password do not match"
-                : "";
-        },
         user() {
             return this.$store.getters.user;
         },

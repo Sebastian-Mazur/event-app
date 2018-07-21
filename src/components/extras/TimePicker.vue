@@ -7,7 +7,6 @@
                 v-model="menu"
                 :nudge-right="40"
                 :return-value.sync="time"
-                :rules="[v => v = null || 'Time select is required']" 
                 lazy
                 transition="scale-transition"
                 offset-y
@@ -22,6 +21,7 @@
                 :label="labelName"
                 prepend-icon="access_time"
                 readonly
+                required
                 ></v-text-field>
                 <v-time-picker v-model="time" @change="pushTime"></v-time-picker>
             </v-menu>

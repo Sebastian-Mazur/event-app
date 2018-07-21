@@ -49,18 +49,16 @@
 </template>
 
 <script>
+import googleMaps from "../extras/googleMaps";
+
 export default {
     props: ["id"],
     computed: {
         event() {
-            console.log(this.$store.getters.loadedEvent(this.id));
             return this.$store.getters.loadedEvent(this.id);
         },
         userIsAuthenticated() {
-            return (
-                this.$store.getters.user !== null &&
-                this.$store.getters.user !== undefined
-            );
+            return this.$store.getters.userIsAuthenticated;
         },
         userIsCreator() {
             if (!this.userIsAuthenticated) {
@@ -70,48 +68,8 @@ export default {
         }
     },
     mounted: function() {
-        const myLatLng = {
-            lat: this.event.location.latitude,
-            lng: this.event.location.longitude
-        };
-
-        const map = new google.maps.Map(document.getElementById("googleMap"), {
-            zoom: 10,
-            center: myLatLng
-        });
-
-        const marker = new google.maps.Marker({
-            position: myLatLng,
-            map: map,
-            title: "Hello World!"
-        });
-
-        const infowindow = new google.maps.InfoWindow();
-        const service = new google.maps.places.PlacesService(map);
-
-        service.getDetails(
-            {
-                placeId: this.event.location.place_id
-            },
-            function(place, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    const marker = new google.maps.Marker({
-                        map: map,
-                        position: place.geometry.location
-                    });
-                    google.maps.event.addListener(marker, "click", function() {
-                        infowindow.setContent(
-                            "<div><strong>" +
-                                place.name +
-                                "</strong><br>" +
-                                place.formatted_address +
-                                "</div>"
-                        );
-                        infowindow.open(map, this);
-                    });
-                }
-            }
-        );
+        const location = this.event;
+        googleMaps.googleMaps(location);
     },
     methods: {
         registerEvent() {}
