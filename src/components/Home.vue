@@ -145,6 +145,8 @@
 </template>
 
 <script>
+import { vm } from "../config/config";
+
 export default {
     data() {
         return {
@@ -152,16 +154,7 @@ export default {
             eventsSelected: [],
             searchByTitle: "",
             searchByLocation: "",
-            categories: [
-                "Arts",
-                "Business",
-                "Charity and Causes",
-                "Community",
-                "Film and media",
-                "Food and drink",
-                "Music",
-                "Others"
-            ],
+            categories: vm.categories,
             searchByCategories: [],
             searchEvents: [],
             locationName: ""

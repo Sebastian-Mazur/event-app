@@ -26,4 +26,7 @@ export default {
 </script>
 
 <style>
+.input-group.input-group--error .input-group__messages {
+    color: none;
+}
 </style>

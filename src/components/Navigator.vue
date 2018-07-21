@@ -40,13 +40,13 @@
                 </v-list-group>
                 <v-list-tile v-if="userIsAuthenticated" @click="logout">
                     <v-list-tile-action>
-                            <v-icon>exit_to_app</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-title class="title">Logout</v-list-tile-title>
+                        <v-icon>exit_to_app</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-title class="title">Logout</v-list-tile-title>
                 </v-list-tile>
             </v-list>
         </v-navigation-drawer>
-        <v-toolbar color="secondary" dark fixed app class="hidden-lg-and-up">
+        <v-toolbar color="secondary" dark fixed app class="hidden-md-and-up">
             <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
             <v-toolbar-title>Events</v-toolbar-title>
         </v-toolbar>        
@@ -62,64 +62,49 @@ export default {
         };
     },
     computed: {
+        userIsAuthenticated() {
+            return this.$store.getters.userIsAuthenticated;
+        },
         menus() {
             let menus = [
                 {
-                    name: "User",
-                    icon: "account_circle",
+                    name: "Events",
+                    icon: "event",
                     items: [
                         {
-                            name: "SignIn",
-                            icon: "person_outline",
-                            link: "/user/signin"
+                            name: "Create event",
+                            icon: "add_box",
+                            link: "/event/new"
                         },
                         {
-                            name: "SignUp",
-                            icon: "person_add",
-                            link: "/user/signup"
+                            name: "My events",
+                            icon: "chrome_reader_mode",
+                            link: "/event/my-events"
                         }
                     ]
-                },
-                { name: "Informations", icon: "info" }
+                }
             ];
-            if (this.userIsAuthenticated) {
+            if (!this.userIsAuthenticated) {
                 menus = [
-                    // {
-                    //     name: "User",
-                    //     icon: "account_circle",
-                    //     items: [
-                    //         {
-                    //             name: "Profile",
-                    //             icon: "person",
-                    //             link: "/user/profile"
-                    //         }
-                    //     ]
-                    // },
                     {
-                        name: "Events",
-                        icon: "event",
+                        name: "User",
+                        icon: "account_circle",
                         items: [
                             {
-                                name: "Create event",
-                                icon: "add_box",
-                                link: "/event/new"
+                                name: "SignIn",
+                                icon: "person_outline",
+                                link: "/user/signin"
                             },
                             {
-                                name: "My events",
-                                icon: "chrome_reader_mode",
-                                link: "/event/my-events"
+                                name: "SignUp",
+                                icon: "person_add",
+                                link: "/user/signup"
                             }
                         ]
                     }
                 ];
             }
             return menus;
-        },
-        userIsAuthenticated() {
-            return (
-                this.$store.getters.user !== null &&
-                this.$store.getters.user !== undefined
-            );
         }
     },
     methods: {
