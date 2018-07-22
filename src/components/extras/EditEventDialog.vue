@@ -1,7 +1,7 @@
 <template>
     <v-layout row>
         <div>
-            <v-btn color="primary" @click.native.stop="dialog = true">Edit eventEdited</v-btn> 
+            <v-btn color="primary" @click.native.stop="dialog = true">Edit event</v-btn> 
         </div>
         <v-dialog v-model="dialog" persistent max-width="650"> 
             <v-card>           
