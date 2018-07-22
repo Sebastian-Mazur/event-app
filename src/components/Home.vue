@@ -97,7 +97,7 @@
             wrap
             justify-center
             align-center>
-            <v-flex xs12 sm6 md4 v-for="(event) in foundEvents" 
+            <v-flex xs12 sm6 md6 v-for="(event) in foundEvents" 
             :key="event.id" class="pa-2">
                 <v-card>
                     <v-container fluid>
@@ -154,7 +154,7 @@ export default {
             eventsSelected: [],
             searchByTitle: "",
             searchByLocation: "",
-            categories: vm.categories,
+            categories: vm.$data.category,
             searchByCategories: [],
             searchEvents: [],
             locationName: ""

@@ -105,7 +105,7 @@ export default {
             let searchByCategories = payload.searchByCategories
             let eventsSelected = getters.loadedEvents
 
-            if (searchByTitle !== "" && searchByLocation === "" && searchByCategories.length == 0) {
+            if (searchByTitle !== "" && searchByLocation === "" && searchByCategories.length === 0) {
                 commit('setSearchedEvents', eventsSelected.filter(event => {
                     return event.title
                         .toLowerCase()

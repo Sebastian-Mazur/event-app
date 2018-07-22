@@ -1,6 +1,7 @@
 <template>
     <v-card>
         <v-navigation-drawer
+            mobile-break-point="1024"
             fixed    
             app
             v-model="drawer"
@@ -57,8 +58,8 @@
 export default {
     data() {
         return {
-            drawer: true,
-            mini: true
+            drawer: true
+            // mini: true
         };
     },
     computed: {

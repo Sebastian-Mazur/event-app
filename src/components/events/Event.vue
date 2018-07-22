@@ -1,7 +1,7 @@
 <template>
     <v-container fluid>
         <v-layout row justify-center>
-            <v-flex xs10>
+            <v-flex xs12>
                 <v-card>
                     <v-card-media
                     class="white--text"

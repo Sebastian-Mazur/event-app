@@ -12,7 +12,7 @@
                 </v-layout>
             </v-card>
         </v-flex>
-        <v-flex xs12 sm6 md4 v-for="(event) in myEvents" 
+        <v-flex xs12 sm6 md6 v-for="(event) in myEvents" 
         :key="event.id" class="pa-2">
             <v-card>
                 <v-container fluid>
