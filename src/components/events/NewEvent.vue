@@ -9,7 +9,7 @@
                                 name="title"
                                 label="Title"
                                 id="title"
-                                v-model="title"
+                                v-model="newEvent.title"
                                 :hint="errors.first('title')"
                                 required>
                             </v-text-field>
@@ -21,7 +21,7 @@
                                 name="description"
                                 label="Description"
                                 id="description"
-                                v-model="description"
+                                v-model="newEvent.description"
                                 multi-line
                                 :hint="errors.first('description')"
                                 required>
@@ -34,7 +34,7 @@
                                 name="organizerName"
                                 label="The name of the organizer"
                                 id="organizerName"
-                                v-model="organizerName"
+                                v-model="newEvent.organizerName"
                                 :hint="errors.first('organizerName')"
                                 required>
                             </v-text-field>
@@ -52,8 +52,7 @@
                                 :types='address'            
                                 :clearable="true"                                
                                 :hint="errors.first('location')"
-                                required
-                            >
+                                required>
                             </vuetify-google-autocomplete>
                         </v-flex>
                     </v-layout>                    
@@ -93,7 +92,7 @@
                                 name="imageUrl"
                                 label="Image URL"
                                 id="imageUrl"
-                                v-model="imageUrl"
+                                v-model="newEvent.imageUrl"
                                 type="url"
                                 placeholder="https://www.example.pl"                                
                                 :hint="errors.first('imageUrl')"
@@ -103,14 +102,14 @@
                     </v-layout>
                     <v-layout row>
                         <v-flex xs12 sm6 offset-sm3>
-                            <img :src="imageUrl" height="150">
+                            <img :src="newEvent.imageUrl" height="150">
                         </v-flex>
                     </v-layout>
                      <v-layout row>
                         <v-flex xs12 sm6 offset-sm3>                            
                             <v-select
                                 :items="category"
-                                v-model="categorySelect"
+                                v-model="newEvent.categorySelect"
                                 label="Select category"
                                 multiple
                                 chips                                
@@ -175,18 +174,19 @@ export default {
     validator: null,
     data() {
         return {
+            newEvent: {
+                title: "",
+                location: {},
+                imageUrl: "",
+                description: "",
+                organizerName: "",
+                startDate: null,
+                startTime: null,
+                endDate: null,
+                endTime: null,
+                categorySelect: []
+            },
             address: "",
-            title: "",
-            location: {},
-            imageUrl: "",
-            description: "",
-            organizerName: "",
-            startDate: null,
-            startTime: null,
-            endDate: null,
-            endTime: null,
-            image: null,
-            categorySelect: [],
             category: vm.$data.category,
             errors: null,
             dialog: false,
@@ -199,75 +199,26 @@ export default {
         this.$set(this, "errors", this.validator.errors);
     },
     watch: {
-        title(value) {
-            this.validator.validate("title", value);
-        },
-        description(value) {
-            this.validator.validate("description", value);
-        },
-        organizerName(value) {
-            this.validator.validate("organizerName", value);
-        },
-        location(value) {
-            this.validator.validate("location", value);
-        },
-        imageUrl(value) {
-            this.validator.validate("imageUrl", value);
-        },
-        categorySelect(value) {
-            this.validator.validate("categorySelect", value);
-        },
-        startTime(value) {
-            this.validator.validate("startTime", value);
-        },
-        startDate(value) {
-            this.validator.validate("startDate", value);
-        },
-        endTime(value) {
-            this.validator.validate("endTime", value);
-        },
-        endDate(value) {
-            this.validator.validate("endDate", value);
+        newEvent(value) {
+            Object.keys(this.newEvent).forEach(function(key) {
+                console.log([key]);
+                this.validator.validate(`${[key]}`, value);
+            });
         }
     },
     methods: {
         validateForm() {
-            this.validator
-                .validateAll({
-                    title: this.title,
-                    description: this.description,
-                    organizerName: this.organizerName,
-                    locality: this.location,
-                    imageUrl: this.imageUrl,
-                    categorySelect: this.categorySelect,
-                    startTime: this.startTime,
-                    startDate: this.startDate,
-                    endTime: this.endTime,
-                    endDate: this.endDate
-                })
-                .then(result => {
-                    if (result) {
-                        this.validate = result;
-                        return;
-                    }
-                });
+            this.validator.validateAll(this.newEvent).then(result => {
+                if (result) {
+                    this.validate = result;
+                    return;
+                }
+            });
             this.messages = this.validator.errors.items;
             this.dialog = true;
         },
         createNewEvents() {
-            const newEvent = {
-                title: this.title,
-                location: this.location,
-                imageUrl: this.imageUrl,
-                description: this.description,
-                startDate: this.startDate,
-                startTime: this.startTime,
-                endDate: this.endDate,
-                endTime: this.endTime,
-                categorySelect: this.categorySelect,
-                organizerName: this.organizerName
-            };
-            this.$store.dispatch("createEvent", newEvent);
+            this.$store.dispatch("createEvent", this.newEvent);
             this.dialog = false;
             this.$router.push("/");
         },
@@ -282,7 +233,7 @@ export default {
             ) {
                 return;
             } else {
-                this.location = {
+                this.newEvent.location = {
                     country: addressData.country,
                     latitude: addressData.latitude,
                     longitude: addressData.longitude,
@@ -294,16 +245,16 @@ export default {
             }
         },
         setStartDate(event) {
-            this.startDate = event;
+            this.newEvent.startDate = event;
         },
         setEndDate(event) {
-            this.endDate = event;
+            this.newEvent.endDate = event;
         },
         setStartTime(event) {
-            this.startTime = event;
+            this.newEvent.startTime = event;
         },
         setEndTime(event) {
-            this.endTime = event;
+            this.newEvent.endTime = event;
         }
     }
 };

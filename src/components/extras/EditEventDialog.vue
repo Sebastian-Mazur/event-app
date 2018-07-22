@@ -1,7 +1,7 @@
 <template>
     <v-layout row>
         <div>
-            <v-btn color="primary" @click.native.stop="dialog = true">Edit event</v-btn> 
+            <v-btn color="primary" @click.native.stop="dialog = true">Edit eventEdited</v-btn> 
         </div>
         <v-dialog v-model="dialog" persistent max-width="650"> 
             <v-card>           
@@ -12,14 +12,14 @@
                                 name="tittle"
                                 label="Title"
                                 id="title"
-                                v-model="editedTitle"
+                                v-model="eventEdited.title"
                                 required>
                             </v-text-field>
                             <v-text-field
                                 name="description"
                                 label="Description"
                                 id="description"
-                                v-model="editedDescription"
+                                v-model="eventEdited.description"
                                 multi-line
                                 required>
                             </v-text-field>
@@ -27,36 +27,36 @@
                                 name="organizerName"
                                 label="The name of the organizer"
                                 id="organizerName"
-                                v-model="editedOrganizerName"
+                                v-model="eventEdited.organizerName"
                                 required>
                             </v-text-field>
                             <vuetify-google-autocomplete            
                                 id="map"
                                 classname="form-control"
-                                label="Event adress"
-                                :value="editedLocation.name + ', ' + editedLocation.locality + ', ' + editedLocation.country"
+                                label="EventEdited adress"
+                                :value="eventEdited.location.name + ', ' + eventEdited.location.locality + ', ' + eventEdited.location.country"
                                 v-on:placechanged="getAddressData"
                                 country="pl"           
                                 :clearable="true"
                             >
                             </vuetify-google-autocomplete>  
                             <date-picker 
-                                :editedDate="editedStartDate" 
+                                :editedDate="eventEdited.startDate" 
                                 @setDate="setStartDate($event)" 
                                 labelName="Start date">
                             </date-picker>                        
                             <time-picker 
-                                :editedTime="editedStartTime" 
+                                :editedTime="eventEdited.startTime" 
                                 @setTime="setStartTime($event)" 
                                 labelName="Start Time">
                             </time-picker>
                             <date-picker 
-                                :editedDate="editedEndDate" 
+                                :editedDate="eventEdited.endDate" 
                                 @setDate="setEndDate($event)" 
                                 labelName="End date">
                             </date-picker>
                             <time-picker 
-                                :editedTime="editedEndTime"
+                                :editedTime="eventEdited.endTime"
                                 @setTime="setEndTime($event)"
                                 labelName="End time">
                             </time-picker>                      
@@ -64,15 +64,15 @@
                                 name="imageUrl"
                                 label="Image URL"
                                 id="imageUrl"
-                                v-model="editedImageUrl"
+                                v-model="eventEdited.imageUrl"
                                 type="url"
                                 placeholder="https://www.example.pl"
                                 required>
                             </v-text-field>
-                            <img :src="editedImageUrl" height="150">                        
+                            <img :src="eventEdited.imageUrl" height="150">                        
                             <v-select
                                 :items="category"
-                                v-model="editedCategorySelect"
+                                v-model="eventEdited.categorySelect"
                                 label="Select a category"
                                 multiple
                                 chips
@@ -108,119 +108,49 @@ export default {
     props: ["event"],
     data() {
         return {
+            eventEdited: {
+                categorySelect: this.event.categorySelect,
+                title: this.event.title,
+                description: this.event.description,
+                organizerName: this.event.organizerName,
+                location: this.event.location,
+                imageUrl: this.event.imageUrl,
+                startDate: this.event.startDate,
+                startTime: this.event.startTime,
+                endDate: this.event.endDate,
+                endTime: this.event.endTime
+            },
             category: vm.$data.category,
-            editedCategorySelect: this.event.categorySelect,
-            editedTitle: this.event.title,
-            editedDescription: this.event.description,
-            editedOrganizerName: this.event.organizerName,
-            editedLocation: this.event.location,
-            editedImageUrl: this.event.imageUrl,
-            editedStartDate: this.event.startDate,
-            editedStartTime: this.event.startTime,
-            editedEndDate: this.event.endDate,
-            editedEndTime: this.event.endTime,
             dialog: false,
             validate: false,
             messages: []
         };
     },
     created() {
-        this.validator = new Validator(vm.$data.validRulesEdit);
+        this.validator = new Validator(vm.$data.validRules);
         this.$set(this, "errors", this.validator.errors);
     },
     watch: {
-        editedTitle(value) {
-            this.validator.validate("editedTitle", value);
-        },
-        editedDescription(value) {
-            this.validator.validate("editedDescription", value);
-        },
-        editedOrganizerName(value) {
-            this.validator.validate("editedOrganizerName", value);
-        },
-        editedLocation(value) {
-            this.validator.validate("editedLocation", value);
-        },
-        editedImageUrl(value) {
-            this.validator.validate("editedImageUrl", value);
-        },
-        editedCategorySelect(value) {
-            this.validator.validate("editedCategorySelect", value);
-        },
-        editedStartTime(value) {
-            this.validator.validate("editedStartTime", value);
-        },
-        editedStartDate(value) {
-            this.validator.validate("editedStartDate", value);
-        },
-        editedEndTime(value) {
-            this.validator.validate("editedEndTime", value);
-        },
-        editedEndDate(value) {
-            this.validator.validate("editedEndDate", value);
+        newEventEdited(value) {
+            Object.keys(this.eventEdited).forEach(function(key) {
+                this.validator.validate(`${[key]}`, value);
+            });
         }
     },
     methods: {
-        validateForm() {
-            this.validator
-                .validateAll({
-                    editedTitle: this.editedTitle,
-                    editedDescription: this.editedDescription,
-                    editedOrganizerName: this.editedOrganizerName,
-                    editedLocation: this.editedLocation,
-                    editedImageUrl: this.editedImageUrl,
-                    editedCategorySelect: this.editedCategorySelect,
-                    editedStartTime: this.editedStartTime,
-                    editedStartDate: this.editedStartDate,
-                    editedEndTime: this.editedEndTime,
-                    editedEndDate: this.editedEndDate
-                })
-                .then(result => {
-                    if (result) {
-                        this.validate = result;
-                        return;
-                    }
-                    this.messages = this.validator.errors.items;
-                });
-        },
         onSaveChanges() {
-            this.validator
-                .validateAll({
-                    editedTitle: this.editedTitle,
-                    editedDescription: this.editedDescription,
-                    editedOrganizerName: this.editedOrganizerName,
-                    editedLocation: this.editedLocation,
-                    editedImageUrl: this.editedImageUrl,
-                    editedCategorySelect: this.editedCategorySelect,
-                    editedStartTime: this.editedStartTime,
-                    editedStartDate: this.editedStartDate,
-                    editedEndTime: this.editedEndTime,
-                    editedEndDate: this.editedEndDate
-                })
-                .then(result => {
-                    if (result) {
-                        this.validate = result;
-                        this.dialog = false;
-                        const editedEvent = {
-                            id: this.event.id,
-                            title: this.editedTitle,
-                            description: this.editedDescription,
-                            organizerName: this.editedOrganizerName,
-                            location: this.editedLocation,
-                            categorySelect: this.editedCategorySelect,
-                            imageUrl: this.editedImageUrl,
-                            startDate: this.editedStartDate,
-                            startTime: this.editedStartTime,
-                            endDate: this.editedEndDate,
-                            endTime: this.editedEndTime,
-                            creatorID: this.event.creatorID
-                        };
-                        this.$store.dispatch("updateEventData", editedEvent);
-                        return;
-                    }
-                    this.messages = this.validator.errors.items;
-                    this.dialog = true;
-                });
+            this.validator.validateAll(this.eventEdited).then(result => {
+                if (result) {
+                    this.validate = result;
+                    this.dialog = false;
+                    this.eventEdited.id = this.event.id;
+                    this.eventEdited.creatorID = this.event.creatorID;
+                    this.$store.dispatch("updateEventData", this.eventEdited);
+                    return;
+                }
+                this.messages = this.validator.errors.items;
+                this.dialog = true;
+            });
         },
         getAddressData(addressData, placeResultData, id) {
             if (
@@ -230,7 +160,7 @@ export default {
             ) {
                 return;
             } else {
-                this.editedLocation = {
+                this.eventEdited.location = {
                     country: addressData.country,
                     latitude: addressData.latitude,
                     longitude: addressData.longitude,
@@ -245,16 +175,16 @@ export default {
             this.errors.clear();
         },
         setStartDate(event) {
-            this.editedStartDate = event;
+            this.eventEdited.startDate = event;
         },
         setEndDate(event) {
-            this.editedEndDate = event;
+            this.eventEdited.endDate = event;
         },
         setStartTime(event) {
-            this.editedStartTime = event;
+            this.eventEdited.startTime = event;
         },
         setEndTime(event) {
-            this.editedEndTime = event;
+            this.eventEdited.endTime = event;
         }
     }
 };

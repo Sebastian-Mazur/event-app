@@ -14,18 +14,6 @@ export const vm = new Vue({
             endTime: "required",
             endDate: "required"
         },
-        validRulesEdit: {
-            editedTitle: "required|min:6",
-            editedDescription: "required|min:10",
-            editedOrganizerName: "required|min:6",
-            editedLocation: "required",
-            editedImageUrl: "required|url",
-            editedCategorySelect: "required",
-            editedStartTime: "required",
-            editedStartDate: "required",
-            editedEndTime: "required",
-            editedEndDate: "required"
-        },
         category: [
             "Arts",
             "Business",
